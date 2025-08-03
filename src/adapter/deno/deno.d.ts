@@ -76,4 +76,6 @@ declare namespace Deno {
      */
     idleTimeout?: number
   }
+
+  export function memoryUsage(): unknown
 }
