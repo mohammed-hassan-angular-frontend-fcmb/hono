@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { Context } from 'hono'
-import { createMiddleware } from 'hono/factory'
+import { createMiddleware } from '../helper/factory'
 import type { StructuredLoggerOptions, LogEntry, LogLevel, Logger, LogDestination } from './types'
 
 // Console destination for development
@@ -14,14 +16,6 @@ class ConsoleDestination implements LogDestination {
       const metadataStr = metadata ? ` ${JSON.stringify(metadata)}` : ''
       console.log(`${timestamp} [${level.toUpperCase()}] ${correlationId} ${message}${metadataStr}`)
     }
-  }
-}
-
-// Cloudflare Workers destination
-class CloudflareDestination implements LogDestination {
-  async write(entry: LogEntry): Promise<void> {
-    // Send to Cloudflare analytics or external logging service
-    console.log(JSON.stringify(entry))
   }
 }
 

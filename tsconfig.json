@@ -3,6 +3,7 @@
     "target": "ES2022",
     "declaration": true,
     "moduleResolution": "Bundler",
+    "rootDir": "./src",
     "outDir": "./dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

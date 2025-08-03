@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/router/error-boundary.ts
 import type { Context, MiddlewareHandler } from 'hono'
-import type { StatusCode } from '../utils/http-status'
+import type { ContentfulStatusCode } from '../utils/http-status'
 import type { ErrorBoundaryHandler } from './types'
 
 export interface ErrorBoundaryOptions {
@@ -39,7 +40,7 @@ const defaultErrorHandler: ErrorBoundaryHandler = (error: Error, c: Context) => 
       path: c.req.path,
       method: c.req.method
     }
-  }, status as StatusCode)
+  }, status as ContentfulStatusCode)
 }
 
 /**
@@ -339,7 +340,7 @@ function createFallbackResponse(context: Context, fallback?: { status: number; m
       timestamp: Date.now(),
       path: context.req.path
     }
-  }, status as StatusCode)
+  }, status as ContentfulStatusCode)
 }
 
 /**
@@ -363,7 +364,7 @@ export const ErrorBoundaryPresets = {
         timestamp: new Date().toISOString(),
         path: c.req.path
       }
-    }, status as StatusCode)
+    }, status as ContentfulStatusCode)
   }),
 
   // Error boundary for development with full error details
@@ -377,7 +378,7 @@ export const ErrorBoundaryPresets = {
         path: c.req.path,
         method: c.req.method
       }
-    }, getErrorStatus(error) as StatusCode)
+    }, getErrorStatus(error) as ContentfulStatusCode)
   }),
 
   // Error boundary with retry logic

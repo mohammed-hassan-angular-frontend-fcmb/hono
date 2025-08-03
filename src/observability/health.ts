@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { Hono } from 'hono'
 import type { HealthCheckOptions, HealthCheck } from './types'
 

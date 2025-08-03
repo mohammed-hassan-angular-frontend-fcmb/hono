@@ -66,7 +66,7 @@ export const smartCORS = (options: SmartCORSOptions = {}) => {
       c.header('Access-Control-Max-Age', maxAge.toString())
 
       if (!preflightContinue) {
-        return c.text('', 204)
+        return c.body(null, 204)
       }
     }
 

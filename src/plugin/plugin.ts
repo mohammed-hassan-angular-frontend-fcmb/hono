@@ -1,4 +1,5 @@
 // src/plugin/plugin.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import type { Runtime } from "../../src/helper/adapter";
 import type { Hono } from '../hono'

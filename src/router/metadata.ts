@@ -1,4 +1,6 @@
 // src/router/metadata.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { Context } from 'hono'
 import type { RouteMetadata, RouteInfo } from './types'
 

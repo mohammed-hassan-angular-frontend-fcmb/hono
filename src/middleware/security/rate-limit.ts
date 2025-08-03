@@ -4,6 +4,10 @@ import type { Context } from 'hono'
 import { createMiddleware } from 'hono/factory'
 import type { RateLimitOptions, RateLimitStore, RateLimitInfo } from './types'
 
+interface KVNamespace {
+  get(key: string): Promise<string | null>
+  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>
+}
 
 class MemoryStore implements RateLimitStore {
   private store = new Map<string, { count: number; resetTime: number }>()
@@ -34,7 +38,7 @@ class MemoryStore implements RateLimitStore {
 
 // Runtime-specific stores
 class CloudflareKVStore implements RateLimitStore {
-  constructor(private kv: any) {}
+  constructor(private kv: KVNamespace) {}
 
   async get(key: string): Promise<number | null> {
     const value = await this.kv.get(`rate_limit:${key}`)
@@ -131,6 +135,6 @@ export const rateLimit = (options: RateLimitOptions) => {
 }
 
 // Helper for creating Cloudflare KV store
-export const createCloudflareKVStore = (kv: any): RateLimitStore => {
+export const createCloudflareKVStore = (kv: KVNamespace): RateLimitStore => {
   return new CloudflareKVStore(kv)
 }

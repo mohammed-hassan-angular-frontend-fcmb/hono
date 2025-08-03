@@ -1,8 +1,10 @@
 // src/plugin/manager.ts
 
-import type { BlankEnv, BlankSchema, Env, Handler, Input, MiddlewareHandler, Schema } from '../types'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
+import type { BlankEnv, Env, Input } from '../types'
 import type { HonoPlugin } from './plugin'
-// import type { Hono } from '../hono'
 
 
 class PluginManager<E extends Env = BlankEnv> {

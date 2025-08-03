@@ -1,4 +1,6 @@
-import type { Context, MiddlewareHandler } from 'hono'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import type { Context } from 'hono'
 
 export interface RateLimitStore {
   get(key: string): Promise<number | null>

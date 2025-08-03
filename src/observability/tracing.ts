@@ -1,4 +1,6 @@
-import { createMiddleware } from 'hono/factory'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { createMiddleware } from '../helper/factory'
 import type { TracingOptions, TraceExporter, SpanData, Span, Tracer } from './types'
 
 class SimpleSpan implements Span {

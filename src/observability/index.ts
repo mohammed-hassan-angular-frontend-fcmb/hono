@@ -1,4 +1,15 @@
 export { structuredLogger, consoleLogger, jsonLogger } from './logger'
+
+
+export interface LoggerVariables {
+  logger: Logger
+  correlationId: string
+}
+
+declare module '../context' {
+  interface ContextVariableMap extends LoggerVariables {}
+}
+
 export { metricsCollector } from './metrics'
 export { tracing } from './tracing'
 export { healthCheck, databaseHealthCheck, externalServiceHealthCheck } from './health'
@@ -28,6 +39,7 @@ import type { MiddlewareHandler } from 'hono'
 import { structuredLogger } from './logger'
 import { metricsCollector } from './metrics'
 import { tracing } from './tracing'
+import type { Logger } from './types'
 
 export interface ObservabilitySuiteOptions {
   serviceName: string

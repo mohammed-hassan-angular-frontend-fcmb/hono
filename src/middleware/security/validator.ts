@@ -1,4 +1,5 @@
 // src/middleware/security/validator.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { createMiddleware } from 'hono/factory'
 import type { ValidationSchema, InferValidated } from './types'

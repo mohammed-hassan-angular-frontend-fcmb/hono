@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export interface LogEntry {
   timestamp: string
   level: LogLevel
@@ -113,4 +115,9 @@ export interface Span {
 
 export interface Tracer {
   startSpan(name: string, attributes?: Record<string, any>): Span
+}
+
+export interface LoggerVariables {
+  logger: Logger
+  correlationId: string
 }

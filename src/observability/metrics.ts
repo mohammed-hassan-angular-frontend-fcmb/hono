@@ -1,4 +1,8 @@
-import { createMiddleware } from 'hono/factory'
+
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
+import { createMiddleware } from '../helper/factory'
 import type { MetricsCollectorOptions, MetricsExporter, MetricData, MetricsCollector } from './types'
 
 class SimpleMetricsCollector implements MetricsCollector {

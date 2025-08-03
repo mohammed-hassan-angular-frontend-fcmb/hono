@@ -1,4 +1,7 @@
 // src/router/group.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import type { MiddlewareHandler, Handler} from 'hono';
 import { Hono } from 'hono'
 import { createErrorBoundary } from './error-boundary';

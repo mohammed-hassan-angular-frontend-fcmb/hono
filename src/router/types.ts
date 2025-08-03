@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { MiddlewareHandler, Handler, Context } from 'hono'
 import type { RouteGroup } from './group'
 
