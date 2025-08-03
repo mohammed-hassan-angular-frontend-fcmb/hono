@@ -1,4 +1,4 @@
-import { createMiddleware } from 'hono/factory'
+import { createMiddleware } from '../../helper/factory'
 import type { SecurityHeadersOptions } from './types'
 
 const defaultCSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; frame-ancestors 'none';"

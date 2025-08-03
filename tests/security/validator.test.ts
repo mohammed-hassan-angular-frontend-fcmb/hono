@@ -1,6 +1,6 @@
 // tests/security/validator.test.ts
-import { Hono } from 'hono'
 import { describe, it, expect, beforeEach } from 'vitest'
+import { Hono } from '../../src/hono'
 import { validator, createStringValidator, createNumberValidator } from '../../src/middleware/security'
 
 describe('Validator Middleware', () => {

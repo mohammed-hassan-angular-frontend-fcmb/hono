@@ -1,6 +1,6 @@
 // // src/middleware/security/cors.ts
 
-import { createMiddleware } from 'hono/factory'
+import { createMiddleware } from '../../helper/factory'
 import type { SmartCORSOptions } from './types'
 
 const defaultAllowedMethods = ['GET', 'HEAD', 'PUT', 'POST', 'DELETE', 'PATCH']

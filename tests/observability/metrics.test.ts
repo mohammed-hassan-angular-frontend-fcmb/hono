@@ -1,4 +1,6 @@
 // tests/observability/metrics.test.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { Hono } from '../../src/hono'
 import { metricsCollector } from '../../src/observability'

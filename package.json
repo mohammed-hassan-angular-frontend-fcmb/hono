@@ -34,8 +34,10 @@
     "release": "np",
     "remove-dist": "rm -rf dist",
     "test:coverage": "vitest run --coverage",
-    "test:performance": "vitest run tests/performance/**/*.test.ts",
     "test:security": "vitest run tests/security/**/*.test.ts",
+    "test:router": "vitest run tests/router/**/*.test.ts",
+    "test:observability": "vitest run tests/observability/*.test.ts",
+    "test:performance": "vitest run tests/performance/**/*.test.ts",
     "test:ui": "vitest --ui",
     "type-check": "tsc --noEmit --strict",
     "elint": "eslint src/ -c eslint.config.mjs --format stylish"

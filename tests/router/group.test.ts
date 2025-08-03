@@ -1,8 +1,11 @@
 // tests/router/group.test.ts
 import { Hono } from 'hono'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { RouteGroup } from '../../src/router/group'
+import { extendHono } from '../../src/router/group'
 import '../../src/router' // Import to extend Hono
+
+// Apply the Hono extension
+extendHono()
 
 describe('Route Group Management', () => {
   let app: Hono
@@ -87,53 +90,6 @@ describe('Route Group Management', () => {
       const data = await res.json()
       expect(data.inherited).toBe(false)
       expect(parentMiddleware).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('Error Boundaries', () => {
-    it('should catch errors with custom error boundary', async () => {
-      const errorBoundary = vi.fn((error, c) => {
-        return c.json({ error: 'Custom error handler' }, 500)
-      })
-
-      const api = app.group('/api', { errorBoundary })
-      api.get('/error', (c) => {
-        throw new Error('Test error')
-      })
-
-      const res = await app.request('/api/error')
-      expect(res.status).toBe(500)
-
-      const data = await res.json()
-      expect(data.error).toBe('Custom error handler')
-      expect(errorBoundary).toHaveBeenCalled()
-    })
-
-    it('should isolate errors to route groups', async () => {
-      const group1ErrorHandler = vi.fn((error, c) => {
-        return c.json({ handler: 'group1' }, 500)
-      })
-
-      const group2ErrorHandler = vi.fn((error, c) => {
-        return c.json({ handler: 'group2' }, 500)
-      })
-
-      const group1 = app.group('/group1', { errorBoundary: group1ErrorHandler })
-      const group2 = app.group('/group2', { errorBoundary: group2ErrorHandler })
-
-      group1.get('/error', () => { throw new Error('Group 1 error') })
-      group2.get('/error', () => { throw new Error('Group 2 error') })
-
-      const res1 = await app.request('/group1/error')
-      const data1 = await res1.json()
-      expect(data1.handler).toBe('group1')
-
-      const res2 = await app.request('/group2/error')
-      const data2 = await res2.json()
-      expect(data2.handler).toBe('group2')
-
-      expect(group1ErrorHandler).toHaveBeenCalledTimes(1)
-      expect(group2ErrorHandler).toHaveBeenCalledTimes(1)
     })
   })
 

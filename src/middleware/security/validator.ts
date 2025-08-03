@@ -1,7 +1,7 @@
 // src/middleware/security/validator.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { createMiddleware } from 'hono/factory'
+import { createMiddleware } from '../../helper/factory'
 import type { ValidationSchema, InferValidated } from './types'
 
 export const validator = <T extends ValidationSchema>(schema: T) => {

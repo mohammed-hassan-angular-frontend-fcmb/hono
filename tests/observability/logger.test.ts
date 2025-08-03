@@ -1,10 +1,12 @@
 // tests/observability/logger.test.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { Hono } from '../../src/hono'
 import { structuredLogger } from '../../src/observability'
 
 describe('Structured Logger', () => {
   let app: Hono
+
   let mockDestination: any
 
   beforeEach(() => {

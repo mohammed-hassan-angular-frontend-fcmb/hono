@@ -1,7 +1,7 @@
 // src/middleware/security/rate-limit.ts
 
 import type { Context } from 'hono'
-import { createMiddleware } from 'hono/factory'
+import { createMiddleware } from '../../helper/factory'
 import type { RateLimitOptions, RateLimitStore, RateLimitInfo } from './types'
 
 interface KVNamespace {

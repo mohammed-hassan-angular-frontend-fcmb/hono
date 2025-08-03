@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 // src/router/group.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -18,6 +19,7 @@ export class RouteGroup {
   private config: RouteGroupConfig
   private app: Hono
   private parentGroup?: RouteGroup
+  public parentApp?: Hono
 
   constructor(options: RouteGroupOptions = {}) {
     this.config = {
@@ -35,19 +37,19 @@ export class RouteGroup {
   }
 
   private setupMiddleware(): void {
-    // Apply inherited middleware first
+    // Apply error boundary first so it can catch all errors
+    if (this.config.errorBoundary) {
+      this.app.use('*', createErrorBoundary(this.config.errorBoundary))
+    }
+
+    // Apply inherited middleware
     if (this.config.inheritMiddleware && this.parentGroup) {
       const inheritedMiddleware = this.parentGroup.getInheritedMiddleware()
-      inheritedMiddleware.forEach(mw => this.app.use(mw))
+      inheritedMiddleware.forEach(mw => this.app.use('*', mw))
     }
 
     // Apply group-specific middleware
-    this.config.middleware.forEach(mw => this.app.use(mw))
-
-    // Apply error boundary if specified
-    if (this.config.errorBoundary) {
-      this.app.use(createErrorBoundary(this.config.errorBoundary))
-    }
+    this.config.middleware.forEach(mw => this.app.use('*', mw))
   }
 
   private getInheritedMiddleware(): MiddlewareHandler[] {
@@ -73,7 +75,7 @@ export class RouteGroup {
     return applicableMiddleware
   }
 
-  private normalizeBasePath(path: string): string {
+  public normalizeBasePath(path: string): string {
     const fullPath = this.config.basePath + path
     return fullPath.replace(/\/+/g, '/').replace(/\/$/, '') || '/'
   }
@@ -112,20 +114,21 @@ export class RouteGroup {
   }
 
   private addRoute(method: string, path: string, handlers: Handler[]): RouteGroup {
-    const normalizedPath = this.normalizeBasePath(path)
-
     const routeInfo: RouteInfo = {
       method,
-      path: normalizedPath,
-      metadata: this.config.metadata,
+      path,
+      metadata: { ...this.config.metadata },
       handlers
     }
 
-    // Apply conditional middleware
+    // Store the route info first
+    this.config.routes.push(routeInfo)
+
+    // Apply conditional middleware after route is stored
     const conditionalMiddleware = this.applyConditionalMiddleware(routeInfo)
     const allHandlers = [...conditionalMiddleware, ...handlers]
 
-    // Register route with Hono app
+    // Register route with internal Hono app
     switch (method) {
       case 'GET':
         this.app.get(path, ...allHandlers)
@@ -142,6 +145,9 @@ export class RouteGroup {
       case 'PATCH':
         this.app.patch(path, ...allHandlers)
         break
+      case 'HEAD':
+        this.app.get(path, ...allHandlers)
+        break
       case 'OPTIONS':
         this.app.options(path, ...allHandlers)
         break
@@ -150,7 +156,52 @@ export class RouteGroup {
         break
     }
 
-    this.config.routes.push(routeInfo)
+    // Also register with parent app if it exists
+    if (this.parentApp) {
+      const fullPath = this.normalizeBasePath(path)
+      // Get all inherited middleware for this route
+      const inheritedMiddleware = this.getInheritedMiddleware()
+
+      // Add error boundary middleware if it exists - this should come FIRST
+      const errorBoundaryMiddleware = this.config.errorBoundary
+        ? [createErrorBoundary(this.config.errorBoundary)]
+        : []
+
+      const allMiddlewareAndHandlers = [
+        ...errorBoundaryMiddleware,
+        ...inheritedMiddleware,
+        ...conditionalMiddleware,
+        ...handlers
+      ]
+
+      switch (method) {
+        case 'GET':
+          this.parentApp.get(fullPath, ...allMiddlewareAndHandlers)
+          break
+        case 'POST':
+          this.parentApp.post(fullPath, ...allMiddlewareAndHandlers)
+          break
+        case 'PUT':
+          this.parentApp.put(fullPath, ...allMiddlewareAndHandlers)
+          break
+        case 'DELETE':
+          this.parentApp.delete(fullPath, ...allMiddlewareAndHandlers)
+          break
+        case 'PATCH':
+          this.parentApp.patch(fullPath, ...allMiddlewareAndHandlers)
+          break
+        case 'HEAD':
+          this.parentApp.get(fullPath, ...allMiddlewareAndHandlers)
+          break
+        case 'OPTIONS':
+          this.parentApp.options(fullPath, ...allMiddlewareAndHandlers)
+          break
+        case 'ALL':
+          this.parentApp.all(fullPath, ...allMiddlewareAndHandlers)
+          break
+      }
+    }
+
     return this
   }
 
@@ -166,7 +217,47 @@ export class RouteGroup {
       condition,
       middleware
     })
+
+    // Re-register existing routes to apply new conditional middleware
+    this.reregisterRoutes()
+
     return this
+  }
+
+  private reregisterRoutes(): void {
+    // Clear the current app and recreate it
+    this.app = new Hono()
+    this.setupMiddleware()
+
+    // Re-register all routes with updated conditional middleware
+    this.config.routes.forEach(route => {
+      const conditionalMiddleware = this.applyConditionalMiddleware(route)
+      const allHandlers = [...conditionalMiddleware, ...route.handlers]
+
+      switch (route.method) {
+        case 'GET':
+          this.app.get(route.path, ...allHandlers)
+          break
+        case 'POST':
+          this.app.post(route.path, ...allHandlers)
+          break
+        case 'PUT':
+          this.app.put(route.path, ...allHandlers)
+          break
+        case 'DELETE':
+          this.app.delete(route.path, ...allHandlers)
+          break
+        case 'PATCH':
+          this.app.patch(route.path, ...allHandlers)
+          break
+        case 'OPTIONS':
+          this.app.options(route.path, ...allHandlers)
+          break
+        case 'ALL':
+          this.app.all(route.path, ...allHandlers)
+          break
+      }
+    })
   }
 
   // Group management
@@ -179,6 +270,8 @@ export class RouteGroup {
     })
 
     subGroup.parentGroup = this
+    // Set the parent app to the root app, not this group's app
+    subGroup.parentApp = this.parentApp || this.app
     subGroup.setupMiddleware()
 
     this.config.subGroups.push(subGroup)
@@ -218,7 +311,8 @@ export class RouteGroup {
   // Error boundary management
   errorBoundary(handler: ErrorBoundaryHandler): RouteGroup {
     this.config.errorBoundary = handler
-    this.app.use(createErrorBoundary(handler))
+    // Re-setup middleware to include the new error boundary
+    this.setupMiddleware()
     return this
   }
 
@@ -353,13 +447,14 @@ export function extendHono() {
   const HonoPrototype = Hono.prototype as any
 
   HonoPrototype.group = function(basePath: string, options?: RouteGroupOptions): RouteGroup {
+    const parentApp = this
     const group = new RouteGroup({
       ...options,
       basePath
     })
 
-    // Mount the group automatically
-    group.mount(this, basePath)
+    // Set parent app reference so routes get registered
+    group.parentApp = parentApp
 
     return group
   }

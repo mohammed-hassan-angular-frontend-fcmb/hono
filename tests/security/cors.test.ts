@@ -1,6 +1,6 @@
 // tests/security/cors.test.ts
-import { Hono } from 'hono'
 import { describe, it, expect, beforeEach } from 'vitest'
+import { Hono } from '../../src/hono'
 import { smartCORS } from '../../src/middleware/security'
 
 describe('CORS Middleware', () => {
@@ -61,7 +61,7 @@ describe('CORS Middleware', () => {
       const invalidRes = await app.request('/', {
         headers: { 'Origin': 'https://malicious.com' }
       })
-      expect(invalidRes.headers.get('Access-Control-Allow-Origin')).toBe('false')
+      expect(invalidRes.headers.get('Access-Control-Allow-Origin')).toBeNull()
     })
 
     it('should validate function origins', async () => {
@@ -78,7 +78,7 @@ describe('CORS Middleware', () => {
       const invalidRes = await app.request('/', {
         headers: { 'Origin': 'https://evil.com' }
       })
-      expect(invalidRes.headers.get('Access-Control-Allow-Origin')).toBe('false')
+      expect(invalidRes.headers.get('Access-Control-Allow-Origin')).toBeNull()
     })
   })
 
